@@ -2,16 +2,27 @@
 (function() {
   'use strict';
 
+  var selectSign = function(problemType) {
+    var types = ['add', 'sub'];
+    if (problemType === 'both') {
+      problemType = types[_.random(1)]; 
+    }
+    if (problemType === 'add') return '+';
+    else return '-';
+  }
+
   var regenerate = function() {
     var maxNumber = $('#maxnumber').val();
     var problemCount = $('#problemcount').val();
+    var problemType = $('#problemtype').val();
 
     $('.problems').empty();
     var compiled = _.template('<section class="problem">' +
                               '<div class="topnumber number">' +
                               '<%- topNumber %></div>' +
                               '<div class="bottom">' +
-                              '<div class="sign">+</div>' +
+                              '<div class="sign">' +
+                              '<%- sign %></div>' +
                               '<div class="bottomnumber number">' +
                               '<%- bottomNumber %></div>' +
                               '</section>');
@@ -43,8 +54,17 @@
         }
         tries++;
       }
+      var selectedSign = selectSign(problemType);
+      if (selectedSign === '-' && bottomNumber > topNumber) {
+        var tmp = bottomNumber;
+        bottomNumber = topNumber;
+        topNumber = tmp;
+      }
       seen.push([topNumber, bottomNumber]); 
-      var compiledHTML = compiled({ 'topNumber': topNumber, 'bottomNumber': bottomNumber});
+      var compiledHTML = compiled(
+        {'topNumber': topNumber,
+         'bottomNumber': bottomNumber,
+         'sign' : selectedSign});
       $('.problems').append(compiledHTML);
     }
   };
